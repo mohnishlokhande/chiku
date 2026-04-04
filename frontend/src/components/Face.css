@@ -1,4 +1,4 @@
-.face {
+.ghost {
   width: 60vmin;
   height: 60vmin;
   max-width: 300px;
@@ -6,145 +6,158 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  overflow: visible;
 }
 
-/* Head */
-.face__head {
-  fill: url(#faceGrad);
-  stroke: #7c3aed;
+/* ==================== */
+/* Ghost body           */
+/* ==================== */
+.ghost__shape {
+  fill: #2e1065;
+  stroke: #8b5cf6;
+  stroke-width: 1.5;
+  transition: stroke 0.3s ease, fill 0.3s ease;
+}
+
+.ghost__shape--angry {
+  stroke: #ef4444;
   stroke-width: 2;
+}
+
+.ghost__shape--happy {
+  stroke: #a78bfa;
+  stroke-width: 2;
+}
+
+.ghost__shape--surprised {
+  stroke: #c084fc;
+  stroke-width: 2;
+}
+
+.ghost__shape--sad {
+  stroke: #6d28d9;
+  opacity: 0.85;
+}
+
+.ghost__body {
   transform-origin: center;
   will-change: transform;
 }
 
-/* Eyes */
-.face__eye-white {
-  fill: #fff;
-  opacity: 0.95;
-  transition: ry 0.3s ease;
-}
-
-.face__pupil {
-  fill: #1a1a2e;
-  transform-origin: center;
-  will-change: transform;
-  transition: transform 0.3s ease;
-}
-
-.face__highlight {
-  fill: #fff;
-}
-
-/* Mouths — all hidden by default */
-.face__mouth {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.face__mouth--idle,
-.face__mouth--thinking {
-  stroke: #fff;
-  stroke-width: 3;
-  fill: none;
-  stroke-linecap: round;
-}
-
-.face__mouth--listening,
-.face__mouth--speaking {
-  fill: #1a1020;
-  stroke: #fff;
-  stroke-width: 2;
-}
-
-/* Thinking dots — hidden by default */
-.face__thinking-dots {
-  opacity: 0;
+/* Expression layers — smooth transitions */
+.ghost__expression,
+.ghost svg > g {
   transition: opacity 0.3s ease;
 }
 
-.face__thinking-dots circle {
-  fill: #a78bfa;
+/* ==================== */
+/* STATE: idle (float)  */
+/* ==================== */
+.ghost--idle .ghost__body {
+  animation: ghost-float 4s ease-in-out infinite;
 }
 
-/* ==================== */
-/* STATE: idle          */
-/* ==================== */
-.face--idle .face__head {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-.face--idle .face__mouth--idle {
-  opacity: 1;
+.ghost--idle .ghost__particles {
+  animation: ghost-particles-drift 6s ease-in-out infinite;
 }
 
 /* ==================== */
 /* STATE: listening     */
 /* ==================== */
-.face--listening .face__head {
+.ghost--listening .ghost__body {
+  animation: ghost-pulse 1.5s ease-in-out infinite;
+}
+
+.ghost--listening .ghost__shape {
   stroke: #a78bfa;
   stroke-width: 2.5;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.face--listening .face__eye-white {
-  ry: 20;
-}
-
-.face--listening .face__mouth--listening {
-  opacity: 1;
 }
 
 /* ==================== */
 /* STATE: thinking      */
 /* ==================== */
-.face--thinking .face__pupil {
+.ghost--thinking .ghost__body {
+  animation: ghost-float 3s ease-in-out infinite;
+}
+
+.ghost__thinking-pupil {
+  transform-origin: center;
+}
+
+.ghost--thinking .ghost__thinking-pupil {
   animation: look-around 2s ease-in-out infinite;
 }
 
-.face--thinking .face__mouth--thinking {
-  opacity: 1;
+.ghost__thought-bubble {
+  transform-origin: center;
 }
 
-.face--thinking .face__thinking-dots {
-  opacity: 1;
-}
-
-.face--thinking .face__thinking-dots circle {
-  animation: dot-bounce 1.2s ease-in-out infinite;
-}
-
-.face--thinking .face__thinking-dots circle:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.face--thinking .face__thinking-dots circle:nth-child(3) {
-  animation-delay: 0.4s;
+.ghost--thinking .ghost__thought-bubble {
+  animation: thought-pulse 2s ease-in-out infinite;
 }
 
 /* ==================== */
 /* STATE: speaking      */
 /* ==================== */
-.face--speaking .face__eye-white {
-  ry: 13;
+.ghost--speaking .ghost__body {
+  animation: ghost-bounce 0.8s ease-in-out infinite;
 }
 
-.face--speaking .face__mouth--speaking {
-  opacity: 1;
+.ghost__speaking-mouth ellipse:first-child {
   transform-origin: center;
-  animation: talk 0.3s ease-in-out infinite alternate;
+  animation: ghost-talk 0.3s ease-in-out infinite alternate;
+}
+
+/* ==================== */
+/* Emotion extras       */
+/* ==================== */
+
+/* Happy sparkles */
+.ghost__sparkle {
+  animation: sparkle-pulse 1.5s ease-in-out infinite;
+}
+
+.ghost__sparkle:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+/* Sad tear */
+.ghost__tear {
+  animation: tear-fall 3s ease-in-out infinite;
+}
+
+/* Angry fury */
+.ghost__fury {
+  animation: fury-shake 0.3s ease-in-out infinite;
+}
+
+/* Annoyed sweat */
+.ghost__sweat {
+  animation: sweat-drop 2s ease-in-out infinite;
 }
 
 /* ==================== */
 /* KEYFRAMES            */
 /* ==================== */
-@keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+@keyframes ghost-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes pulse {
+@keyframes ghost-pulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes ghost-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-4px) scale(1.02); }
+  75% { transform: translateY(2px) scale(0.98); }
+}
+
+@keyframes ghost-talk {
+  from { transform: scaleY(1) scaleX(1); }
+  to { transform: scaleY(0.5) scaleX(1.1); }
 }
 
 @keyframes look-around {
@@ -153,12 +166,35 @@
   75% { transform: translateX(-5px) translateY(2px); }
 }
 
-@keyframes dot-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(-8px); opacity: 1; }
+@keyframes thought-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.7; }
 }
 
-@keyframes talk {
-  from { transform: scaleY(1); }
-  to { transform: scaleY(0.6); }
+@keyframes ghost-particles-drift {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-5px); opacity: 0.7; }
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes tear-fall {
+  0% { transform: translateY(0); opacity: 0.6; }
+  70% { transform: translateY(12px); opacity: 0.3; }
+  100% { transform: translateY(0); opacity: 0.6; }
+}
+
+@keyframes fury-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes sweat-drop {
+  0% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(8px); opacity: 0.5; }
+  100% { transform: translateY(0); opacity: 0.3; }
 }

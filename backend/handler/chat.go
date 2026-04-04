@@ -17,11 +17,16 @@ func NewChatHandler(provider llm.Provider) fiber.Handler {
 			return c.Status(400).JSON(fiber.Map{"error": "message is required"})
 		}
 
-		reply, err := provider.Complete(c.Context(), req.Message)
+		raw, err := provider.Complete(c.Context(), req.Message)
 		if err != nil {
 			return c.Status(502).JSON(fiber.Map{"error": "LLM unavailable"})
 		}
 
-		return c.JSON(model.ChatResponse{Reply: reply})
+		result := llm.ParseResponse(raw)
+
+		return c.JSON(model.ChatResponse{
+			Reply:   result.Reply,
+			Emotion: result.Emotion,
+		})
 	}
 }

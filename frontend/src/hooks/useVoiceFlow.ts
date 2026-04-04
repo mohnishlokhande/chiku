@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
-import type { CompanionState } from "../types";
+import type { CompanionState, Emotion } from "../types";
 import { useSpeechRecognition } from "./useSpeechRecognition";
 import { useSpeechSynthesis } from "./useSpeechSynthesis";
 import { chat } from "../services/api";
 
 interface VoiceFlowHook {
   state: CompanionState;
+  emotion: Emotion;
   start: () => void;
   sendText: (text: string) => void;
   lastUserText: string;
@@ -16,6 +17,7 @@ interface VoiceFlowHook {
 
 export function useVoiceFlow(): VoiceFlowHook {
   const [state, setState] = useState<CompanionState>("idle");
+  const [emotion, setEmotion] = useState<Emotion>("sarcastic");
   const [lastUserText, setLastUserText] = useState("");
   const [lastReply, setLastReply] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,16 +33,18 @@ export function useVoiceFlow(): VoiceFlowHook {
       try {
         // Thinking
         setState("thinking");
-        const reply = await chat(text);
-        setLastReply(reply);
+        const result = await chat(text);
+        setLastReply(result.reply);
+        setEmotion(result.emotion);
 
-        // Speaking
+        // Speaking — show the emotion on the face while speaking
         if (synthSupported) {
           setState("speaking");
-          await speak(reply);
+          await speak(result.reply);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong");
+        setEmotion("sad");
       } finally {
         setState("idle");
       }
@@ -79,6 +83,7 @@ export function useVoiceFlow(): VoiceFlowHook {
 
   return {
     state,
+    emotion,
     start,
     sendText,
     lastUserText,

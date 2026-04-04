@@ -6,7 +6,7 @@ import { useVoiceFlow } from "./hooks/useVoiceFlow";
 import "./App.css";
 
 function App() {
-  const { state, start, sendText, lastUserText, lastReply, error, voiceSupported } =
+  const { state, emotion, start, sendText, lastUserText, lastReply, error, voiceSupported } =
     useVoiceFlow();
 
   const useTextMode =
@@ -28,7 +28,7 @@ function App() {
   return (
     <div className="app">
       <div className="app__face-area">
-        <Face state={state} onClick={useTextMode ? undefined : start} />
+        <Face state={state} emotion={emotion} onClick={useTextMode ? undefined : start} />
       </div>
 
       <StatusBar state={state} error={error} />

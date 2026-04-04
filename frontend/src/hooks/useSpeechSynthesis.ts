@@ -1,9 +1,39 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 
 interface SpeechSynthesisHook {
   speak: (text: string) => Promise<void>;
   warmUp: () => void;
   isSupported: boolean;
+  voices: SpeechSynthesisVoice[];
+  selectedVoice: SpeechSynthesisVoice | null;
+  setVoiceByName: (name: string) => void;
+}
+
+// Prefer these voices in order (good for a sarcastic AI companion)
+const PREFERRED_VOICES = [
+  "Google UK English Male",
+  "Daniel",                    // macOS/iOS British male
+  "Microsoft Mark",            // Windows
+  "Google UK English Female",
+  "Samantha",                  // macOS/iOS
+  "Google US English",
+];
+
+function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  if (voices.length === 0) return null;
+
+  // Try preferred voices first
+  for (const preferred of PREFERRED_VOICES) {
+    const match = voices.find((v) => v.name.includes(preferred));
+    if (match) return match;
+  }
+
+  // Fallback: first English voice
+  const english = voices.find((v) => v.lang.startsWith("en"));
+  if (english) return english;
+
+  // Last resort: first available
+  return voices[0];
 }
 
 export function useSpeechSynthesis(): SpeechSynthesisHook {
@@ -12,10 +42,36 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
     []
   );
 
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+
+  // Load voices (they load asynchronously on some browsers)
+  useEffect(() => {
+    if (!isSupported) return;
+
+    const loadVoices = () => {
+      const available = speechSynthesis.getVoices();
+      setVoices(available);
+      if (!selectedVoice) {
+        setSelectedVoice(pickBestVoice(available));
+      }
+    };
+
+    loadVoices();
+    speechSynthesis.addEventListener("voiceschanged", loadVoices);
+    return () => speechSynthesis.removeEventListener("voiceschanged", loadVoices);
+  }, [isSupported, selectedVoice]);
+
+  const setVoiceByName = useCallback(
+    (name: string) => {
+      const match = voices.find((v) => v.name === name);
+      if (match) setSelectedVoice(match);
+    },
+    [voices]
+  );
+
   const warmUp = useCallback(() => {
     if (!isSupported) return;
-    // iOS requires speechSynthesis to be triggered from a user gesture.
-    // Speak an empty utterance on tap to reserve the gesture context.
     const utterance = new SpeechSynthesisUtterance("");
     utterance.volume = 0;
     speechSynthesis.speak(utterance);
@@ -29,12 +85,15 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
           return;
         }
 
-        // Clear any queued speech
         speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.1;
-        utterance.pitch = 1.0;
+        utterance.rate = 1.05;
+        utterance.pitch = 0.95;
+
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
 
         utterance.onend = () => resolve();
         utterance.onerror = (event) =>
@@ -43,8 +102,8 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
         speechSynthesis.speak(utterance);
       });
     },
-    [isSupported]
+    [isSupported, selectedVoice]
   );
 
-  return { speak, warmUp, isSupported };
+  return { speak, warmUp, isSupported, voices, selectedVoice, setVoiceByName };
 }
