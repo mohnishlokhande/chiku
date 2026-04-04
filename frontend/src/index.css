@@ -1,0 +1,5 @@
+/* Reset handled in App.css — this file intentionally minimal */
+#root {
+  width: 100%;
+  height: 100%;
+}

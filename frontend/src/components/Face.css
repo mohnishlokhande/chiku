@@ -1,0 +1,164 @@
+.face {
+  width: 60vmin;
+  height: 60vmin;
+  max-width: 300px;
+  max-height: 300px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Head */
+.face__head {
+  fill: url(#faceGrad);
+  stroke: #7c3aed;
+  stroke-width: 2;
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Eyes */
+.face__eye-white {
+  fill: #fff;
+  opacity: 0.95;
+  transition: ry 0.3s ease;
+}
+
+.face__pupil {
+  fill: #1a1a2e;
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 0.3s ease;
+}
+
+.face__highlight {
+  fill: #fff;
+}
+
+/* Mouths — all hidden by default */
+.face__mouth {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.face__mouth--idle,
+.face__mouth--thinking {
+  stroke: #fff;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.face__mouth--listening,
+.face__mouth--speaking {
+  fill: #1a1020;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+/* Thinking dots — hidden by default */
+.face__thinking-dots {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.face__thinking-dots circle {
+  fill: #a78bfa;
+}
+
+/* ==================== */
+/* STATE: idle          */
+/* ==================== */
+.face--idle .face__head {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.face--idle .face__mouth--idle {
+  opacity: 1;
+}
+
+/* ==================== */
+/* STATE: listening     */
+/* ==================== */
+.face--listening .face__head {
+  stroke: #a78bfa;
+  stroke-width: 2.5;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.face--listening .face__eye-white {
+  ry: 20;
+}
+
+.face--listening .face__mouth--listening {
+  opacity: 1;
+}
+
+/* ==================== */
+/* STATE: thinking      */
+/* ==================== */
+.face--thinking .face__pupil {
+  animation: look-around 2s ease-in-out infinite;
+}
+
+.face--thinking .face__mouth--thinking {
+  opacity: 1;
+}
+
+.face--thinking .face__thinking-dots {
+  opacity: 1;
+}
+
+.face--thinking .face__thinking-dots circle {
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+
+.face--thinking .face__thinking-dots circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.face--thinking .face__thinking-dots circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ==================== */
+/* STATE: speaking      */
+/* ==================== */
+.face--speaking .face__eye-white {
+  ry: 13;
+}
+
+.face--speaking .face__mouth--speaking {
+  opacity: 1;
+  transform-origin: center;
+  animation: talk 0.3s ease-in-out infinite alternate;
+}
+
+/* ==================== */
+/* KEYFRAMES            */
+/* ==================== */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes look-around {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(5px) translateY(-3px); }
+  75% { transform: translateX(-5px) translateY(2px); }
+}
+
+@keyframes dot-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+@keyframes talk {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.6); }
+}
