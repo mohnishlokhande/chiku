@@ -45,3 +45,16 @@ Frontend (React + TypeScript):
 
   Key improvement: MediaRecorder works on all browsers (Chrome, Edge, Firefox, Safari) — no more not-allowed
   errors. The mic permission prompt will still appear once, but it's the standard one that always works.
+
+   # First time only
+  make setup
+
+  # Every time after
+  make dev
+
+  make dev starts all 3 services (Whisper, Go backend, Vite frontend) in one terminal. Ctrl+C stops them all.
+
+  Other commands:
+  - make install — reinstall dependencies
+  - make stop — kill any leftover processes
+  - make dev-frontend / make dev-backend / make dev-whisper — run individually
