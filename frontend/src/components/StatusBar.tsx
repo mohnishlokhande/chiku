@@ -2,7 +2,7 @@ import type { CompanionState } from "../types";
 
 const STATUS_TEXT: Record<CompanionState, string> = {
   idle: "Tap to talk",
-  listening: "Listening...",
+  listening: "Recording... tap to stop",
   thinking: "Thinking...",
   speaking: "Speaking...",
 };

@@ -29,6 +29,7 @@ func main() {
 	}))
 
 	app.Post("/api/chat", handler.NewChatHandler(provider))
+	app.Post("/api/transcribe", handler.NewTranscribeHandler(cfg.WhisperURL))
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})

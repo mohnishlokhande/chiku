@@ -30,3 +30,18 @@ Frontend (React + TypeScript):
 - useVoiceFlow hook orchestrates the full listen → think → speak loop
 - Text input fallback when mic unavailable (or add ?text=1 to URL)
 - Dark theme, optimized for old phones (CSS-only animations, system fonts)
+
+
+ # Terminal 1: Whisper (first time will download ~75MB model)
+  pip install faster-whisper-server
+  WHISPER__MODEL=tiny WHISPER__INFERENCE_DEVICE=cpu faster-whisper-server
+
+  # Terminal 2: Ollama + Backend
+  ollama serve &
+  cd backend && go run main.go
+
+  # Terminal 3: Frontend
+  cd frontend && npm run dev
+
+  Key improvement: MediaRecorder works on all browsers (Chrome, Edge, Firefox, Safari) — no more not-allowed
+  errors. The mic permission prompt will still appear once, but it's the standard one that always works.

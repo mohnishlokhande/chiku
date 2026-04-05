@@ -22,7 +22,7 @@ export function useVoiceFlow(): VoiceFlowHook {
   const [lastReply, setLastReply] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const { listen, isSupported: speechSupported } = useSpeechRecognition();
+  const { listen, stopListening, isSupported: speechSupported } = useSpeechRecognition();
   const { speak, warmUp, isSupported: synthSupported } = useSpeechSynthesis();
 
   const processMessage = useCallback(
@@ -53,8 +53,15 @@ export function useVoiceFlow(): VoiceFlowHook {
   );
 
   const start = useCallback(async () => {
-    if (state !== "idle") return;
     setError(null);
+
+    if (state === "listening") {
+      // Tap again to stop recording
+      stopListening();
+      return;
+    }
+
+    if (state !== "idle") return;
 
     // Warm up speech synthesis on user gesture (iOS fix)
     warmUp();
@@ -65,13 +72,14 @@ export function useVoiceFlow(): VoiceFlowHook {
       if (text.trim()) {
         await processMessage(text.trim());
       } else {
+        setError("No speech detected. Try again.");
         setState("idle");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Speech recognition failed");
+      setError(err instanceof Error ? err.message : "Recording failed");
       setState("idle");
     }
-  }, [state, listen, warmUp, processMessage]);
+  }, [state, listen, stopListening, warmUp, processMessage]);
 
   const sendText = useCallback(
     (text: string) => {

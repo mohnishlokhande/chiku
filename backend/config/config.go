@@ -7,6 +7,7 @@ type Config struct {
 	CORSOrigins string
 	OllamaURL   string
 	OllamaModel string
+	WhisperURL  string
 }
 
 func Load() *Config {
@@ -15,6 +16,7 @@ func Load() *Config {
 		CORSOrigins: getEnv("CORS_ORIGINS", "http://localhost:5173"),
 		OllamaURL:   getEnv("OLLAMA_URL", "http://localhost:11434"),
 		OllamaModel: getEnv("OLLAMA_MODEL", "llama3.2:1b"),
+		WhisperURL:  getEnv("WHISPER_URL", "http://localhost:8000"),
 	}
 }
 
