@@ -11,15 +11,17 @@ interface SpeechSynthesisHook {
 
 // Prefer these voices in order (good for a sarcastic AI companion)
 const PREFERRED_VOICES = [
-  "Google UK English Male",
-  "Daniel",                    // macOS/iOS British male
-  "Microsoft Mark",            // Windows
-  "Google UK English Female",
-  "Samantha",                  // macOS/iOS
+  "Google US Indian Male",
+  "Daniel", // macOS/iOS British male
+  "Microsoft Mark", // Windows
+  "Google US Indian Female",
+  "Samantha", // macOS/iOS
   "Google US English",
 ];
 
-function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+function pickBestVoice(
+  voices: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice | null {
   if (voices.length === 0) return null;
 
   // Try preferred voices first
@@ -43,7 +45,8 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
   );
 
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [selectedVoice, setSelectedVoice] =
+    useState<SpeechSynthesisVoice | null>(null);
 
   // Load voices (they load asynchronously on some browsers)
   useEffect(() => {
@@ -59,7 +62,8 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
 
     loadVoices();
     speechSynthesis.addEventListener("voiceschanged", loadVoices);
-    return () => speechSynthesis.removeEventListener("voiceschanged", loadVoices);
+    return () =>
+      speechSynthesis.removeEventListener("voiceschanged", loadVoices);
   }, [isSupported, selectedVoice]);
 
   const setVoiceByName = useCallback(
